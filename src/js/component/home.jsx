@@ -5,6 +5,8 @@ const Home = () => {
   const [user, setUser] = useState('Ruubia');
   const [input, setInput] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [editingTaskId, setEditingTaskId] = useState(null); // Estado para manejar la edición
+  const [editInput, setEditInput] = useState(""); // Estado para almacenar el valor del input de edición
 
   function getTasks() {
     fetch(`${apiUrl}/users/${user}`)
@@ -72,6 +74,29 @@ const Home = () => {
       });
   }
 
+  function updateTask(id, updatedLabel) {
+    fetch(`${apiUrl}/todos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        "label": updatedLabel,
+        "is_done": false
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data) {
+          setEditingTaskId(null); // Salir del modo de edición
+          getTasks();
+        }
+      })
+      .catch(error => {
+        console.error('Error updating task:', error);
+      });
+  }
+
   useEffect(() => {
     createUser();
     getTasks();
@@ -83,10 +108,15 @@ const Home = () => {
     }
   };
 
-  return (
+  const handleEdit = (e, taskId) => {
+    if (e.key === 'Enter' && editInput) {
+      updateTask(taskId, editInput);
+    }
+  };
 
-     <div className="container d-flex flex-column align-items-center my-5">
-       <h1 className="text-center text-muted mb-4">todos</h1>
+  return (
+    <div className="container d-flex flex-column align-items-center my-5">
+      <h1 className="text-center text-muted mb-4">todos</h1>
       <div className="card w-50 shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div className="card-body">
           <input
@@ -95,7 +125,7 @@ const Home = () => {
             placeholder="What needs to be done?"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={addTask} // Agregar tarea al presionar Enter
+            onKeyDown={addTask}
           />
           <ul className="list-group">
             {tasks.length === 0 ? (
@@ -108,8 +138,18 @@ const Home = () => {
                   key={task.id}
                   className="list-group-item d-flex justify-content-between align-items-center"
                 >
-                  {task.label}
-                  <div className="d-flex">
+                  {editingTaskId === task.id ? (
+                    <input
+                      type="text"
+                      value={editInput}
+                      onChange={(e) => setEditInput(e.target.value)}
+                      onKeyDown={(e) => handleEdit(e, task.id)}
+                      className="form-control"
+                    />
+                  ) : (
+                    <>
+                      {task.label}
+                      <div className="d-flex">
                       <span
                         className="editIcon mx-2"
                         onClick={() => {
@@ -125,7 +165,9 @@ const Home = () => {
                       >
                         x
                       </span>
-                 </div>
+                      </div>
+                    </>
+                  )}
                 </li>
               ))
             )}
