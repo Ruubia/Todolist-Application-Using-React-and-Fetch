@@ -8,24 +8,31 @@ const Home = () => {
   const [editingTaskId, setEditingTaskId] = useState(null); // Estado para manejar la edición
   const [editInput, setEditInput] = useState(""); // Estado para almacenar el valor del input de edición
 
-  function getTasks() {
-    fetch(`${apiUrl}/users/${user}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.todos) {
-          setTasks(data.todos);
-        } else {
-          setTasks([]);
-        }
+function getTasks() {
+  fetch(`${apiUrl}/users/${user}`)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else if (response.status === 404) {
+        // Si el usuario no existe, crearlo de nuevo
+        createUser();
+        return getTasks(); // Llamar a getTasks de nuevo después de crear el usuario
       } else {
-        createUser().then(() => getTasks());
+        throw new Error('Error fetching tasks');
       }
-      })
-      .catch(error => {
-        console.error('Error fetching tasks:', error);
+    })
+    .then(data => {
+      if (data.todos) {
+        setTasks(data.todos);
+      } else {
         setTasks([]);
-      });
-  }
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching tasks:', error);
+      setTasks([]);
+    });
+}
 
   function createUser() {
     fetch(`${apiUrl}/users/${user}`, { method: 'POST' })
