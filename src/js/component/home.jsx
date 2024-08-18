@@ -109,12 +109,23 @@ const Home = () => {
                   className="list-group-item d-flex justify-content-between align-items-center"
                 >
                   {task.label}
-                  <span
-                    className="deleteIcon mx-3 fz-1"
-                    onClick={() => deleteTask(task.id)}
-                  >
-                    x
-                  </span>
+                  <div className="d-flex">
+                      <span
+                        className="editIcon mx-2"
+                        onClick={() => {
+                          setEditingTaskId(task.id);
+                          setEditInput(task.label);
+                        }}
+                      >
+                        ✏️
+                      </span>
+                      <span
+                        className="deleteIcon mx-2"
+                        onClick={() => deleteTask(task.id)}
+                      >
+                        x
+                      </span>
+                 </div>
                 </li>
               ))
             )}
