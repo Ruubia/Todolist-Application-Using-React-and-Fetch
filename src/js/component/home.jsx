@@ -85,10 +85,10 @@ const Home = () => {
 
   return (
 
-     <div className="container d-flex justify-content-center border w-25 mx-auto my-5 shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-      <div className="card w-50 mt-5">
+     <div className="container d-flex flex-column align-items-center my-5">
+       <h1 className="text-center text-muted mb-4">todos</h1>
+      <div className="card w-50 shadow-lg p-3 mb-5 bg-body-tertiary rounded">
         <div className="card-body">
-          <h1 className="text-center text-muted mb-4">todos</h1>
           <input
             type="text"
             className="form-control mb-3"
