@@ -17,6 +17,9 @@ const Home = () => {
         } else {
           setTasks([]);
         }
+      } else {
+        createUser().then(() => getTasks());
+      }
       })
       .catch(error => {
         console.error('Error fetching tasks:', error);
